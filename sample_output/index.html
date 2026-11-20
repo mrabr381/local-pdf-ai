@@ -20,17 +20,29 @@
 <h1>📄 Local PDF AI — sample Q&amp;A demo</h1>
 <p>Ask questions about your PDFs in plain English — 100% on your machine. No upload, no account, no API key.</p>
 
-<h2>What was measured</h2>
-<p>Sample document: <em>The Beginner's Guide to Growing Tomatoes</em> — a 4-page PDF generated locally with <code>python scripts/make_sample.py</code>. Every number below comes from a real run of the CLI against it.</p>
+<h2>Real document: USDA canning guide</h2>
+<p>Sample document: <em>USDA Complete Guide to Home Canning, Guide 1: Principles of Home Canning</em> (Agriculture Information Bulletin No. 539, revised 2015) — a US government publication, so public domain. Download it from <a href="https://nchfp.uga.edu/papers/guide/GUIDE01_HomeCan_rev0715.pdf">nchfp.uga.edu</a> (National Center for Home Food Preservation). Every number below comes from a real run of the CLI against it.</p>
 <p>
-  <span class="stat"><strong>4</strong> pages</span>
-  <span class="stat"><strong>7</strong> chunks</span>
+  <span class="stat"><strong>40</strong> pages</span>
+  <span class="stat"><strong>188</strong> chunks</span>
   <span class="stat"><strong>6 / 6</strong> questions, top passage on the right page</span>
   <span class="stat"><strong>byte-identical</strong> repeat answers</span>
   <span class="stat"><strong>0</strong> network calls</span>
 </p>
 
-<h2>Verified questions</h2>
+<table>
+  <tr><th>Question</th><th>Top passage</th><th>Answer in the quote</th></tr>
+  <tr><td>What pH makes a food low-acid?</td><td>p. 8 (0.29)</td><td>Low-acid foods have pH values higher than 4.6</td></tr>
+  <tr><td>What temperature is needed to destroy bacteria in low-acid canned food?</td><td>p. 8 (0.38)</td><td>240° to 250°F, 20 to 100 minutes</td></tr>
+  <tr><td>How long should jars sit undisturbed to cool at room temperature?</td><td>p. 22 (0.44)</td><td>12 to 24 hours</td></tr>
+  <tr><td>How do you test jar seals after cooling?</td><td>p. 25 (0.29)</td><td>Press the lid — if it springs up, it is unsealed</td></tr>
+  <tr><td>What causes botulism in canned food?</td><td>p. 33 (0.14)</td><td>Toxin from <em>Clostridium botulinum</em> in moist, low-acid food</td></tr>
+  <tr><td>What is the correct headspace for low-acid foods in a pressure canner?</td><td>p. 13 (0.26)</td><td>1 to 1-1/4 inches</td></tr>
+</table>
+<p>Full transcripts with the quoted passages: <a href="qa_report_usda.md">qa_report_usda.md</a>. The PDF itself is not in this repo (binary, gitignored) — download it from the link above, save it as <code>sample_data/usda-canning-guide-1.pdf</code>, and run <code>python -m localpdfai ask --pdf sample_data/usda-canning-guide-1.pdf --q "..."</code>.</p>
+
+<h2>Offline fixture: tomato-growing guide</h2>
+<p>The tiny 4-page tomato guide (<em>The Beginner's Guide to Growing Tomatoes</em>, regenerated locally with <code>python scripts/make_sample.py</code>) is the offline test fixture — 7 chunks, 6/6 questions top-1 correct:</p>
 <table>
   <tr><th>Question</th><th>Top passage</th><th>Answer in the quote</th></tr>
   <tr><td>What soil pH do tomatoes need?</td><td>p. 2 (0.33)</td><td>pH between 6.0 and 6.8</td></tr>
@@ -40,7 +52,7 @@
   <tr><td>Should I store tomatoes in the fridge?</td><td>p. 4 (0.26)</td><td>Never — flavour is destroyed, flesh turns mealy</td></tr>
   <tr><td>How far apart should I space tomato plants?</td><td>p. 1 (0.25)</td><td>60 to 90 cm (24 to 36 inches)</td></tr>
 </table>
-<p>Full transcripts with the quoted passages: <a href="qa_report.md">qa_report.md</a>. The saved search index: <a href="sample_index.json">sample_index.json</a>.</p>
+<p>Full transcripts: <a href="qa_report.md">qa_report.md</a>. The saved search index: <a href="sample_index.json">sample_index.json</a>.</p>
 
 <h2>Try it yourself</h2>
 <pre>git clone https://github.com/mrabr381/local-pdf-ai.git
@@ -50,12 +62,12 @@ pip install -r requirements.txt
 python scripts/make_sample.py
 python -m localpdfai ask --pdf sample_data/sample.pdf --q "What soil pH do tomatoes need?"</pre>
 
-<div class="note"><strong>Note:</strong> the sample PDF itself is not stored in this repo — it is binary, so it is regenerated locally by <code>scripts/make_sample.py</code>. That is why this page shows measured numbers in text instead of linking to the PDF.</div>
+<div class="note"><strong>Note:</strong> neither sample PDF is stored in this repo — both are binary, so the tomato guide is regenerated locally by <code>scripts/make_sample.py</code> and the USDA guide is downloaded from the official link above. That is why this page shows measured numbers in text instead of linking to the PDFs.</div>
 
 <h2>Honest limitations</h2>
 <ul>
   <li>Extractive answers quote the document — accurate, but they don't summarise. Generative answers need a local Ollama model (optional).</li>
-  <li>The default TF-IDF backend matches on words, not meaning. Semantic search is an opt-in (<code>--backend st</code>, needs torch).</li>
+  <li>The default TF-IDF backend matches on words, not meaning. Two questions phrased far from the guide's wording missed on top-1 (see <a href="qa_report_usda.md">qa_report_usda.md</a>). Semantic search is an opt-in (<code>--backend st</code>, needs torch).</li>
   <li>Scanned image-only PDFs have no extractable text and are rejected — no OCR yet.</li>
 </ul>
 
