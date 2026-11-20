@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local PDF AI — sample Q&amp;A demo</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; line-height: 1.55; color: #1a1a1a; }
+  h1 { font-size: 1.6rem; } h2 { font-size: 1.2rem; margin-top: 2rem; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { border: 1px solid #ccc; padding: .5rem .6rem; text-align: left; font-size: .95rem; }
+  th { background: #f2f2f2; }
+  code { background: #f2f2f2; padding: .1rem .3rem; border-radius: 3px; }
+  .stat { display: inline-block; background: #eef6ee; border: 1px solid #bcd8bc; border-radius: 6px; padding: .4rem .8rem; margin: .2rem .3rem .2rem 0; }
+  .note { background: #fff8e1; border: 1px solid #e6c87a; border-radius: 6px; padding: .8rem 1rem; }
+  pre { background: #f6f6f6; padding: .8rem; overflow-x: auto; border-radius: 6px; }
+</style>
+</head>
+<body>
+<h1>📄 Local PDF AI — sample Q&amp;A demo</h1>
+<p>Ask questions about your PDFs in plain English — 100% on your machine. No upload, no account, no API key.</p>
+
+<h2>What was measured</h2>
+<p>Sample document: <em>The Beginner's Guide to Growing Tomatoes</em> — a 4-page PDF generated locally with <code>python scripts/make_sample.py</code>. Every number below comes from a real run of the CLI against it.</p>
+<p>
+  <span class="stat"><strong>4</strong> pages</span>
+  <span class="stat"><strong>7</strong> chunks</span>
+  <span class="stat"><strong>6 / 6</strong> questions, top passage on the right page</span>
+  <span class="stat"><strong>byte-identical</strong> repeat answers</span>
+  <span class="stat"><strong>0</strong> network calls</span>
+</p>
+
+<h2>Verified questions</h2>
+<table>
+  <tr><th>Question</th><th>Top passage</th><th>Answer in the quote</th></tr>
+  <tr><td>What soil pH do tomatoes need?</td><td>p. 2 (0.33)</td><td>pH between 6.0 and 6.8</td></tr>
+  <tr><td>How much water do tomato plants need each week?</td><td>p. 2 (0.25)</td><td>1 to 2 inches per week</td></tr>
+  <tr><td>How do I deal with tomato hornworms?</td><td>p. 3 (0.16)</td><td>Pick off by hand into soapy water</td></tr>
+  <tr><td>How long until tomatoes are ready to harvest?</td><td>p. 4 (0.31)</td><td>60 to 80 days</td></tr>
+  <tr><td>Should I store tomatoes in the fridge?</td><td>p. 4 (0.26)</td><td>Never — flavour is destroyed, flesh turns mealy</td></tr>
+  <tr><td>How far apart should I space tomato plants?</td><td>p. 1 (0.25)</td><td>60 to 90 cm (24 to 36 inches)</td></tr>
+</table>
+<p>Full transcripts with the quoted passages: <a href="qa_report.md">qa_report.md</a>. The saved search index: <a href="sample_index.json">sample_index.json</a>.</p>
+
+<h2>Try it yourself</h2>
+<pre>git clone https://github.com/mrabr381/local-pdf-ai.git
+cd local-pdf-ai
+python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r requirements.txt
+python scripts/make_sample.py
+python -m localpdfai ask --pdf sample_data/sample.pdf --q "What soil pH do tomatoes need?"</pre>
+
+<div class="note"><strong>Note:</strong> the sample PDF itself is not stored in this repo — it is binary, so it is regenerated locally by <code>scripts/make_sample.py</code>. That is why this page shows measured numbers in text instead of linking to the PDF.</div>
+
+<h2>Honest limitations</h2>
+<ul>
+  <li>Extractive answers quote the document — accurate, but they don't summarise. Generative answers need a local Ollama model (optional).</li>
+  <li>The default TF-IDF backend matches on words, not meaning. Semantic search is an opt-in (<code>--backend st</code>, needs torch).</li>
+  <li>Scanned image-only PDFs have no extractable text and are rejected — no OCR yet.</li>
+</ul>
+
+<p><a href="https://github.com/mrabr381/local-pdf-ai">Local PDF AI on GitHub</a> — MIT licensed.</p>
+</body>
+</html>

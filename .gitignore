@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# PDFs and indexes are user data — never committed
+*.pdf
+*.localpdfai.json
+
+# Embedding model cache (sentence-transformers, if ever used)
+.cache/
+.sentence_transformers/
+
+# Streamlit / OS
+.streamlit/
+.DS_Store
