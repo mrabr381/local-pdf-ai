@@ -57,6 +57,10 @@ llm_mode = st.sidebar.selectbox(
 )
 top_k = st.sidebar.slider("Passages to retrieve", 1, 5, 3)
 
+st.sidebar.markdown("---")
+st.sidebar.link_button("⭐ Star on GitHub", "https://github.com/mrabr381/local-pdf-ai")
+st.sidebar.link_button("☕ Buy me a coffee", "https://www.buymeacoffee.com/muhammadabubakar")
+
 if uploaded is not None:
     try:
         index = _build_index(uploaded.getvalue(), uploaded.name, backend)

@@ -8,9 +8,20 @@
 
 ![Local PDF AI — ask your PDFs questions in plain English, with page numbers](assets/hero.svg)
 
+[![GitHub stars](https://img.shields.io/github/stars/mrabr381/local-pdf-ai?style=social)](https://github.com/mrabr381/local-pdf-ai) [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/muhammadabubakar)
+
 **Ask questions about your PDFs in plain English — and get answers with page citations.** Everything runs on your machine: no upload, no account, no API key, no subscription. Drop in a contract, a manual, a research paper, a textbook — ask "what is the notice period?" and get the exact passage, with the page number, in seconds.
 
-> **▶ Live demo:** real questions asked of a real government guide — [see the sample Q&A page](https://mrabr381.github.io/local-pdf-ai/sample_output/) (GitHub Pages). Or run the web app yourself: `streamlit run app.py` — 1-click deploy on Streamlit Community Cloud (share.streamlit.io → Create app → repo `mrabr381/local-pdf-ai`, file `app.py` → Deploy; no key needed).
+> **▶ Live demo:** [try it in your browser](https://mrabr381.github.io/local-pdf-ai/demo/) — upload any PDF and ask it questions, or try the built-in sample with one click. No upload, no account, no API key; everything runs in your browser. The measured results behind it — real questions asked of a real government guide — are on the [sample Q&A page](https://mrabr381.github.io/local-pdf-ai/sample_output/) (GitHub Pages). Or run the web app yourself: `streamlit run app.py` — 1-click deploy on Streamlit Community Cloud (share.streamlit.io → Create app → repo `mrabr381/local-pdf-ai`, file `app.py` → Deploy; no key needed).
+
+![Live demo — sample Q&A page: 6/6 questions answered from the real USDA canning guide, with page citations](assets/screenshot.png)
+*Screenshot of the live sample Q&A page — real questions asked of the USDA Complete Guide to Home Canning, 6/6 answered with the right page cited.*
+
+![Screenshot of the demo answering "What soil pH do tomatoes need?" with three quoted passages and page citations](demo/screenshot.png)
+*Screenshot — asking "What soil pH do tomatoes need?" of the built-in tomato guide: top passage p. 2, relevance 0.33, with two more cited passages.*
+
+![Short GIF of the demo: typing a question and the cited answer appearing](demo/demo.gif)
+*GIF — typing the soil-pH question and the cited answer appearing.*
 
 ## A real document, really questioned
 

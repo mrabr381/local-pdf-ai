@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local PDF AI — try it in your browser</title>
+<meta name="description" content="Ask questions about any PDF in plain English, right in your browser. No upload, no account, no API key — the PDF never leaves your machine.">
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; line-height: 1.55; color: #1a1a1a; }
+  h1 { font-size: 1.6rem; } h2 { font-size: 1.2rem; margin-top: 2rem; }
+  code { background: #f2f2f2; padding: .1rem .3rem; border-radius: 3px; }
+  .note { background: #fff8e1; border: 1px solid #e6c87a; border-radius: 6px; padding: .8rem 1rem; }
+  .panel { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+  .dropzone { border: 2px dashed #9db8d2; border-radius: 8px; padding: 1.2rem; text-align: center; background: #f7fafc; }
+  .dropzone.dragging { border-color: #2563eb; background: #eaf2fe; }
+  .btn { display: inline-block; background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: .55rem 1.1rem; font-size: 1rem; cursor: pointer; }
+  .btn:hover { background: #1d4ed8; }
+  .btn.secondary { background: #e5e7eb; color: #1a1a1a; }
+  .btn.secondary:hover { background: #d1d5db; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  #status { min-height: 1.4em; margin: .6rem 0; }
+  #status.error { color: #b91c1c; font-weight: 600; }
+  #doc-stats { margin: .6rem 0; }
+  .qa-row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  #question { flex: 1 1 320px; font-size: 1rem; padding: .55rem .7rem; border: 1px solid #bbb; border-radius: 6px; }
+  #topk { font-size: 1rem; padding: .5rem; border: 1px solid #bbb; border-radius: 6px; }
+  .chip { background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 999px; padding: .3rem .8rem; margin: .2rem .25rem .2rem 0; font-size: .9rem; cursor: pointer; }
+  .chip:hover { background: #dbeafe; }
+  ol.answers { padding-left: 1.2rem; }
+  ol.answers li { margin-bottom: 1rem; }
+  .cite { font-weight: 700; }
+  .score { font-weight: 400; color: #555; font-size: .9rem; }
+  .passage { background: #f6f6f6; border-radius: 6px; padding: .7rem .8rem; margin-top: .3rem; }
+  .muted { color: #555; font-size: .95rem; }
+  .stat { display: inline-block; background: #eef6ee; border: 1px solid #bcd8bc; border-radius: 6px; padding: .4rem .8rem; margin: .2rem .3rem .2rem 0; }
+  input[type="file"] { margin-top: .6rem; }
+</style>
+</head>
+<body>
+<h1>📄 Local PDF AI — try it in your browser</h1>
+<p>Ask questions about your PDFs in plain English — <strong>100% in your browser</strong>. No upload, no account, no API key. Your PDF never leaves your machine: <a href="https://mozilla.github.io/pdf.js/">PDF.js</a> (from a CDN) extracts the text locally, and the same TF-IDF search as the Python tool runs in JavaScript.</p>
+
+<div class="note"><strong>The demo works immediately:</strong> a built-in sample — <em>The Beginner's Guide to Growing Tomatoes</em>, the repo's offline test fixture — is already indexed below. Ask it a question, or upload your own PDF instead.</div>
+
+<h2>1. Choose a document</h2>
+<div class="panel">
+  <p>
+    <button class="btn secondary" id="sample-btn" type="button">↺ Load the built-in sample guide</button>
+  </p>
+  <div class="dropzone" id="dropzone">
+    <strong>Drop a PDF here</strong>, or
+    <input type="file" id="file-input" accept=".pdf,application/pdf">
+    <p class="muted">Scanned image-only PDFs have no extractable text and are rejected — no OCR yet, same as the Python tool.</p>
+  </div>
+  <p id="doc-stats"></p>
+  <p id="status" aria-live="polite"></p>
+</div>
+
+<h2>2. Ask a question</h2>
+<div class="panel">
+  <div class="qa-row">
+    <input type="text" id="question" placeholder="e.g. What soil pH do tomatoes need?" autocomplete="off">
+    <label class="muted" for="topk">Passages
+      <select id="topk">
+        <option value="1">1</option>
+        <option value="3" selected>3</option>
+        <option value="5">5</option>
+      </select>
+    </label>
+    <button class="btn" id="ask-btn" type="button">Ask</button>
+  </div>
+  <p class="muted">Try one:</p>
+  <p id="examples"></p>
+</div>
+
+<h2>Answer</h2>
+<div id="results">
+  <p class="muted">Loading the sample…</p>
+</div>
+
+<h2>How it works</h2>
+<p>
+  <span class="stat"><strong>~600-char</strong> chunks</span>
+  <span class="stat"><strong>100-char</strong> overlap</span>
+  <span class="stat"><strong>TF-IDF</strong> + cosine</span>
+  <span class="stat"><strong>0</strong> network calls for search</span>
+</p>
+<p>The JavaScript in <code>app.js</code> is a direct port of the Python backend: <code>localpdfai/chunking.py</code> (chunks never cross a page boundary, so every citation points at exactly one page), <code>localpdfai/embeddings.py</code> (same stopword list, <code>idf = ln((n+1)/(df+1)) + 1</code>, log-scaled term frequency, L2-normalised rows) and <code>localpdfai/index.py</code> (cosine search, ties broken by chunk order — the same question always returns the same passages). Answers are <strong>extractive</strong>: quoted passages with <code>[p. N]</code> citations and relevance scores. Nothing is invented — and nothing is summarised either; generative answers need the optional local Ollama model in the Python tool.</p>
+<p>On the built-in sample the browser search reproduces the Python results exactly: 4 pages, 7 chunks, <strong>6/6 questions top-1 correct</strong> (see the <a href="../sample_output/qa_report.md">full fixture transcript</a>). For an uploaded PDF the numbers can differ slightly from the CLI, because PDF.js and pypdf extract text a little differently — the ranking method is identical.</p>
+
+<h2>Honest limitations</h2>
+<ul>
+  <li>Extractive answers quote the document — accurate, but they don't summarise.</li>
+  <li>TF-IDF matches on words, not meaning. Ask in the document's own words for the best matches; the Python tool has an opt-in semantic backend (<code>--backend st</code>) that this static demo can't ship.</li>
+  <li>Uploading needs the PDF.js CDN (internet). The built-in sample needs no network at all.</li>
+  <li>Very large PDFs are indexed in memory, in your browser tab — a 500-page PDF will take a while on first index, same as the Python tool.</li>
+</ul>
+
+<p><a href="https://github.com/mrabr381/local-pdf-ai">Local PDF AI on GitHub</a> — MIT licensed. Prefer the command line? <code>pip install -r requirements.txt</code>, then <code>python -m localpdfai ask --pdf your.pdf --q "your question"</code>. Measured results on a real document: <a href="../sample_output/">sample Q&amp;A page</a>.</p>
+
+<noscript><p><strong>This demo needs JavaScript.</strong> Without it, use the Python tool: see the GitHub repo linked above.</p></noscript>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="app.js"></script>
+<footer style="text-align:center; padding: 24px 16px; margin-top: 32px; border-top: 1px solid #e5e7eb;"><a href="https://github.com/mrabr381/local-pdf-ai" target="_blank" rel="noopener">⭐ Star on GitHub</a> &nbsp;·&nbsp; <a href="https://www.buymeacoffee.com/muhammadabubakar" target="_blank" rel="noopener"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy me a coffee" height="40" style="vertical-align: middle;"></a></footer>
+</body>
+</html>
